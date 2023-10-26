@@ -3,7 +3,7 @@ name: Doctests
 on:
   push:
     branches:
-      - doctest*
+      - run_fc639143
   repository_dispatch:
   schedule:
     - cron: "17 2 * * *"
@@ -20,7 +20,7 @@ env:
 
 jobs:
   run_doctests:
-    runs-on: [self-hosted, doc-tests-gpu]
+    runs-on: [single-gpu, nvidia-gpu, yih-dar-shieh-debug-daily]
     container:
       image: huggingface/transformers-all-latest-gpu
       options: --gpus 0 --shm-size "16gb" --ipc host -v /mnt/cache/.cache/huggingface:/mnt/cache/
@@ -39,6 +39,10 @@ jobs:
       - name: GPU visibility
         run: |
           python3 utils/print_env.py
+
+      - name: Uninstall and reInstall torch
+        run: |
+          python3 -m pip install -U torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
       - name: Show installed libraries and their versions
         run: pip freeze
